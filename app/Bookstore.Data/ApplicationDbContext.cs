@@ -35,6 +35,9 @@ namespace Bookstore.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Configure the default schema for PostgreSQL
+            modelBuilder.HasDefaultSchema("bobsusedbookstore_dbo");
+            
             modelBuilder.Entity<Customer>().HasIndex(x => x.Sub).IsUnique();
 
             modelBuilder.Entity<Book>().HasOne(x => x.Publisher).WithMany().HasForeignKey(x => x.PublisherId).OnDelete(DeleteBehavior.Restrict);
@@ -48,6 +51,12 @@ namespace Bookstore.Data
             modelBuilder.Entity<Offer>().HasOne(x => x.Condition).WithMany().HasForeignKey(x => x.ConditionId).OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Order>().HasOne(x => x.Customer).WithMany().OnDelete(DeleteBehavior.Restrict);
+
+            // Configure boolean properties for PostgreSQL compatibility
+            modelBuilder.Entity<Address>().Property(e => e.IsActive).HasColumnType("boolean");
+            modelBuilder.Entity<Book>().Property(e => e.IsInStock).HasColumnType("boolean");
+            modelBuilder.Entity<Book>().Property(e => e.IsLowInStock).HasColumnType("boolean");
+            modelBuilder.Entity<ShoppingCartItem>().Property(e => e.WantToBuy).HasColumnType("boolean");
 
             PopulateDatabase(modelBuilder);
 
